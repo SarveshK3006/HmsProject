@@ -9,6 +9,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.sarvesh.hms.dao.DbConnection;
+import com.sarvesh.hms.dto.Patient;
+
 /**
  * Servlet implementation class SignupServlet
  */
@@ -29,8 +32,11 @@ public class SignupServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		RequestDispatcher dispatcher = request.getRequestDispatcher("/jsp/index.jsp");
-        dispatcher.forward(request, response);
+//		RequestDispatcher dispatcher = request.getRequestDispatcher("/jsp/index.jsp");
+//        dispatcher.forward(request, response);
+		
+		RequestDispatcher dispatcher = request.getRequestDispatcher("/jsp/signup.jsp");
+		dispatcher.forward(request, response);
         
 
 	}
@@ -41,16 +47,84 @@ public class SignupServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	
 		
-	String  user =	request.getParameter("username");
-	String  pass = 	request.getParameter("password");
+	String fname =	request.getParameter("fname");
+	String mname =	request.getParameter("mname");
+	String lname =	request.getParameter("lname");
+	String uname =	request.getParameter("username");
+	String pass =	request.getParameter("password");
+	String dob =	request.getParameter("dob");
+	String email =	request.getParameter("email");
+	String bg =	request.getParameter("bg");
+	String address =	request.getParameter("address");
+	String gender =	request.getParameter("gen");
+	String mob =	request.getParameter("mob");
+	String age =	request.getParameter("age");
+	Patient patient = new Patient();
 	
-	if(pass.equalsIgnoreCase("Sarvesh@123")) {
-		RequestDispatcher dispatcher = request.getRequestDispatcher("/jsp/NewFile.jsp");
-        dispatcher.forward(request, response);
-	}else {
-		RequestDispatcher dispatcher = request.getRequestDispatcher("/jsp/error.jsp");
-        dispatcher.forward(request, response);
+	if(fname !=null && !fname.isEmpty() ) {
+		patient.setFirstName(fname);
 	}
+	
+	if(mname !=null && !mname.isEmpty() ) {
+		patient.setMiddleName(mname);
+	}
+	
+	if(lname !=null && !lname.isEmpty() ) {
+		patient.setLastName(lname);
+	}
+	
+	if(uname !=null && !uname.isEmpty() ) {
+		patient.setUserName(uname);
+	}
+	
+	if(pass !=null && !pass.isEmpty() ) {
+		patient.setPassword(pass);
+	}
+	
+	if(dob !=null && !dob.isEmpty() ) {
+		patient.setDob(dob);
+	}
+	
+	if(age !=null && !age.isEmpty() ) {
+		patient.setAge(age);
+	}
+	
+	if(email !=null && !email.isEmpty() ) {
+		patient.setEmailId(email);
+	}
+	
+	if(bg !=null && !bg.isEmpty() ) {
+		patient.setBloodGroup(bg);
+	}
+	
+	if(gender !=null && !gender.isEmpty() ) {
+		patient.setGender(gender);
+	}
+	
+	if(address !=null && !address.isEmpty() ) {
+		patient.setAddress(address);
+	}
+	
+	if(mob !=null && !mob.isEmpty() ) {
+		patient.setPhoneNo(mob);
+	}
+	
+	
+	
+	
+	
+	System.out.println(patient);
+	DbConnection connection = new DbConnection();
+	connection.executeQuery(patient);
+	
+	
+	
+	RequestDispatcher dispatcher = request.getRequestDispatcher("/jsp/signup.jsp");
+	request.setAttribute("result", "done");
+	dispatcher.forward(request, response);
+	
+	
+	
 		
 	}
 

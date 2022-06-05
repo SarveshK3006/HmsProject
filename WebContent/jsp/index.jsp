@@ -13,7 +13,7 @@
 <!-- partial:index.partial.html -->
 <div id="bg"></div>
 
-<form action="SignupServlet" method="post">
+<form action="#" method="post">
     
     <div class="form-heading">
 <h1>Shree Hospital</h1>
@@ -30,13 +30,20 @@
                <a href="#" class="link">Forgot Your Password?</a>
                </div>
   <div class="form-field">
-    <button class="btn" type="button">Log in</button>
-    <button class="btn" type="submit">Sign up</button>
+    <button class="btn" type="submit">Log in</button>
+    <button onclick="openSignup()" class="btn" type="button">Sign up</button>
   </div>
 
 </form>
-<!-- partial -->
+<form  id="signup" action="SignupServlet" method="get">
+</form>
   
 </body>
+<script type="text/javascript"> 
+function openSignup(){
+	
+	document.getElementById("signup").submit();
+}
 
+</script>
 </html>
