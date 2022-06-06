@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
+
 <!DOCTYPE html>
 <html>
 
@@ -13,14 +14,14 @@
 <!-- partial:index.partial.html -->
 <div id="bg"></div>
 
-<form action="#" method="post">
+<form action="SigninServlet" method="post">
     
     <div class="form-heading">
 <h1>Shree Hospital</h1>
         </div>
        
   <div class="form-field">
-    <input type="email" name="username" placeholder="Email / Username" required/>
+    <input type="text" name="username" placeholder="Email / Username" required/>
   </div>
   
   <div class="form-field">
