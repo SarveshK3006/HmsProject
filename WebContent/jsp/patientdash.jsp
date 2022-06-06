@@ -56,24 +56,24 @@ html, body, h1, h2, h3, h4, h5 {
 							class="material-symbols-outlined fa-fw w3-margin-right w3-text-theme">person</i><%= patient.getFirstName() +" " +patient.getLastName() %>
 					</p>
 					<p>
-						<i class="fa fa-home fa-fw w3-margin-right w3-text-theme"></i>
-						London, UK
+						<i class="fa fa-home fa-fw w3-margin-right w3-text-theme"></i><%= patient.getAddress() %>
+						
 					</p>
 					<p>
-						<i class="fa fa-birthday-cake fa-fw w3-margin-right w3-text-theme"></i>
-						April 1, 1988
-					</p>
-					<p>
-						<i
-							class="material-symbols-outlined fa-fw w3-margin-right w3-text-theme">bloodtype</i>O+ve
+						<i class="fa fa-birthday-cake fa-fw w3-margin-right w3-text-theme"></i><%= patient.getDob() %>
+				
 					</p>
 					<p>
 						<i
-							class="material-symbols-outlined fa-fw w3-margin-right w3-text-theme">call</i>+91......
+							class="material-symbols-outlined fa-fw w3-margin-right w3-text-theme">bloodtype</i><%= patient.getBloodGroup() %>
 					</p>
 					<p>
 						<i
-							class="material-symbols-outlined fa-fw w3-margin-right w3-text-theme">mail</i>sarvesh@gmail.com
+							class="material-symbols-outlined fa-fw w3-margin-right w3-text-theme">call</i><%= patient.getPhoneNo() %>
+					</p>
+					<p>
+						<i
+							class="material-symbols-outlined fa-fw w3-margin-right w3-text-theme">mail</i><%= patient.getEmailId() %>
 					</p>
 
 				</div>
