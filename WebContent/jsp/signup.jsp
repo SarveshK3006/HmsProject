@@ -91,7 +91,7 @@
                       </div>
                         <div class="input-field"  style="width: calc(100% / 2 - 15px) !important">
                           <label>Password</label>
-                          <input type="text" name="password" placeholder="Create your password" required>
+                          <input type="text" name="password " placeholder="Create your password" required>
                       </div>
                       <div class="input-field"  style="width: calc(100% - 15px) !important">
                         <label>Address</label>

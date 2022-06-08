@@ -1,4 +1,7 @@
+<%@page import="com.sarvesh.hms.dto.AppointmentDetails"%>
+<%@page import="java.util.List"%>
 <%@page import="com.sarvesh.hms.dto.Patient"%>
+<%@page import="com.sarvesh.hms.dto.Doctor"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
@@ -10,6 +13,61 @@
 <link rel="stylesheet" href="./css/patientdash.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Document</title>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
+  <script src="http://code.jquery.com/jquery-1.8.3.js"></script>
+  <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+  <script>
+  
+  function load() {
+	  var today = new Date();
+	  var dd = today.getDate()+1;
+	  var mm = today.getMonth() + 1; //January is 0!
+	  var yyyy = today.getFullYear();
+	  if (dd < 10) {
+	    dd = '0' + dd
+	  }
+	  if (mm < 10) {
+	    mm = '0' + mm
+	  }
+
+	  today = yyyy + '-' + mm + '-' + dd;
+	  document.getElementById("date").setAttribute("min", today);
+}
+
+  function myFunction() {
+	  let e =  document.getElementById("docs"); 
+	  //alert(JSON.stringify(e.options[e.selectedIndex].value) )
+	   
+	let date  = document.getElementById("date").value; 
+	  if(date!=null && typeof date!=='undefined' && date.length>2){
+	  
+	  $.ajax({
+	      url:'BookAppoint',
+	      data:{petientId: document.getElementById("petientId").value,
+	    	  datetime:document.getElementById("date").value ,
+	    	  doc: e.options[e.selectedIndex].value,
+	    	  timeslot:document.getElementById("timeslot").value
+	    	  },
+	      type:'post',
+	      cache:false,
+	      success:function(data){
+	         alert("Booking Done Sucessfully !!!");
+	        // $('#somediv').text(responseText); 
+	      },
+	      error:function(){
+	        alert('error');
+	      }
+	   }
+	);   
+	  }else{
+		  alert("Please Select Appropriat Date")
+	  }
+	  
+}
+
+
+	</script>
+
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
 	rel="stylesheet">
 
@@ -32,8 +90,11 @@ html, body, h1, h2, h3, h4, h5 {
 
 </head>
 
-<body>
+<body onload="load()">
 	<% Patient patient = (Patient)request.getAttribute("patient"); %>
+	<% List<Doctor> list =  (List<Doctor>) request.getAttribute("doctor"); %>
+	<% List<AppointmentDetails> details =  (List<AppointmentDetails>) request.getAttribute("details"); %>
+		
 
 
 	<div class="topnav">
@@ -87,42 +148,24 @@ html, body, h1, h2, h3, h4, h5 {
 
 			<div class="w3-card w3-round w3-white">
 				<table>
+				<thead>
 					<tr>
 						<th>Id</th>
-						<th>Appointment</th>
+						<th>Appointment Date</th>
 						<th>Doctor Name</th>
 						<th>Diagnosis</th>
 					</tr>
+					</thead>
+					<tbody>
+					<% for( AppointmentDetails ad : details) { %>
 					<tr>
-						<td>Alfreds Futterkiste</td>
-						<td>Maria Anders</td>
-						<td>Germany</td>
-						<td>hitler</td>
+						<td><%= ad.getId() %></td>
+						<td><%=ad.getDate() + " " + ad.getTimeSlot() %></td>
+						<td><%=ad.getDoctorName() %></td>
+						<td>NA</td>
 					</tr>
-					<tr>
-						<td>Alfreds Futterkiste</td>
-						<td>Maria Anders</td>
-						<td>Germany</td>
-						<td>hitler</td>
-					</tr>
-					<tr>
-						<td>Alfreds Futterkiste</td>
-						<td>Maria Anders</td>
-						<td>Germany</td>
-						<td>hitler</td>
-					</tr>
-					<tr>
-						<td>Alfreds Futterkiste</td>
-						<td>Maria Anders</td>
-						<td>Germany</td>
-						<td>hitler</td>
-					</tr>
-					<tr>
-						<td>Alfreds Futterkiste</td>
-						<td>Maria Anders</td>
-						<td>Germany</td>
-						<td>hitler</td>
-					</tr>
+				<% } %>
+					</tbody>
 				</table>
 			</div>
 		</div>
@@ -132,33 +175,46 @@ html, body, h1, h2, h3, h4, h5 {
 
 	<div class="lower">
 		<div class="w3-card w3-round w3-white" style="padding: 28px">
-			<form action="patientservlet" id="ft-form" method="POST"
-				accept-charset="UTF-8">
+			
 				<fieldset>
 					<legend class="w3-text-theme">Book an appointment</legend>
 					<div class="two-cols">
-						<label class="w3-text-theme"> Doctor Name </label> <select
-							name="drs" id="cars" form="carform">
-							<option value="volvo">Dr.RAM</option>
-							<option value="saab">Dr.Shyam</option>
-							<option value="opel">Dr.Om</option>
-							<option value="audi">Dr.Rahul</option>
-						</select> <label class="w3-text-theme"> Date & Time <input
-							type="datetime-local" class="w3-text-theme"
-							name="Appointment request" required>
-						</label> <input type="text" class="w3-text-theme" name="_gotcha" value=""
-							style="display: none;"> <input type="submit"
-							class="submit-button" value="Submit Request">
+						<label class="w3-text-theme"> Doctor Name </label> 
+						<select name="doc" id="docs" >
+							<%  for(Doctor doc : list) {  %>
+							  <option value=<%= doc.getId() %>><%=doc.getFirstName() +" "+doc.getDegree() %></option>
+							  <% } %>
+						</select> <label class="w3-text-theme">
+              <input type="date" class="w3-text-theme" id = "date" name="datetime" required>
+              <input type="hidden" id="petientId" value ="<%= patient.getId() %>" name="petientId" >
+            </label>
+      <label class="w3-text-theme"> Select Time </label>
+          <select name="timeslot" id="timeslot" >
+            <option value="10am-11am">10am-11am</option>
+            <option value="11am-12pm">11am-12pm</option>
+            <option value="12pm-1pm">12pm-1pm</option>
+            <option value="1pm-2pm">1pm-2pm</option>
+            <option value="2pm-3pm">2pm-3pm</option>
+            <option value="3pm-4pm">3pm-4pm</option>
+            <option value="4pm-5pm">4pm-5pm</option>
+          </select>
+          
+          <input type="text" class="w3-text-theme" name="_gotcha" value=""
+							style="display: none;"> 
+							
+							<button class="submit-button" onclick="myFunction()">Click me</button>
+							
 
 					</div>
 				</fieldset>
 
 
-			</form>
 		</div>
 	</div>
 
 
 
 </body>
+
+
 </html>
