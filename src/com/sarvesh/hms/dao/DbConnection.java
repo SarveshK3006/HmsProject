@@ -7,11 +7,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.sarvesh.hms.dto.Appointment;
 import com.sarvesh.hms.dto.AppointmentDetails;
 import com.sarvesh.hms.dto.Doctor;
 import com.sarvesh.hms.dto.Patient;
+import com.sarvesh.hms.dto.Prescription;
+import com.sarvesh.hms.dto.PrescriptionDetails;
+import com.sarvesh.hms.dto.Tests;
 import com.sun.org.apache.xml.internal.resolver.helpers.PublicId;
 
 public class DbConnection {
@@ -19,6 +24,7 @@ public class DbConnection {
 	private static final String DB_URL = "jdbc:mysql://localhost:3306/test";
 	private static final String USER = "root";
 	private static final String PASS = "root";
+	private static final String SQL_UPDATE_APPOINTMENT = "UPDATE appointment SET isDiagnosed =  ? , diagnosisId = ? where id = ?";
 	private Connection conn = null;
 	private final String SQL_INSERT_PATIENT = "Insert into patient "
 			+ " (firstName,lastName,middleName,userName,password,address,emailId,gender,phoneNo,bloodGroup,age,dob) "
@@ -32,9 +38,26 @@ public class DbConnection {
 
 	private final String SQL_GETALL_DOCTOR = "SELECT * FROM DOCTOR ";
 
-	private final String SQL_PATIENT_DASH = " SELECT ap.id , p.id AS patientId,CONCAT(p.firstName,\" \",p.lastName) AS patientName , "
+	private String SQL_PATIENT_DR_DASH = " SELECT ap.id ,ap.isDiagnosed , ap.diagnosisId ,p.id AS patientId,CONCAT(p.firstName,\" \",p.lastName) AS patientName , "
 			+ " dc.id AS doctorId,CONCAT(dc.firstName ,\" \",dc.lastName )AS doctorName, ap.appDate,ap.timeslot "
-			+ " FROM appointment ap JOIN doctor dc ON ap.doctorId=dc.id JOIN patient p ON ap.patientId=p.id where p.id = ? ";
+			+ " FROM appointment ap JOIN doctor dc ON ap.doctorId=dc.id JOIN patient p ON ap.patientId=p.id ";
+
+	private final String SQL_GET_DOCTOR = " SELECT * FROM DOCTOR WHERE id = ? ";
+
+	private final String SQL_CHECK_LOGIN_DR = " SELECT id FROM DOCTOR WHERE userName = ? and password = ? ";
+
+	private final String SQL_ADD_DIAGNOSIS = " INSERT INTO diagnosis (appoId,patientId,doctorId,remark) VALUES (?,?,?,?) ";
+
+	private final String SQL_SELECT_DIAGNOSIS = " Select * from diagnosis where  appoId = ? ";
+
+	private final String SQL_ADD_TESTS = " INSERT INTO tests (diagnosisid,tests,doctorid,patientid) VALUES (?,?,?,?) ";
+
+	private final String SQL_ADD_PRESCRIPTION = " INSERT INTO prescription (patientid,doctorid,drugs,diagnosisid) VALUES (?,?,?,?) ";
+
+	private final String SQ_GET_PRESCRIPTION = " SELECT d.id ,dr.degree ,CONCAT(p.firstName,\" \",p.lastName) AS 'patientName' , CONCAT(dr.firstName,\" \",dr.lastName) AS 'doctorName' FROM diagnosis d JOIN patient p ON d.patientId=p.id JOIN doctor dr on d.doctorId=dr.id WHERE d.id = ? ";
+
+	private final String SQ_GET_TEST = " SELECT * FROM tests t WHERE t.diagnosisid = ? ";
+	private final String SQ_GET_prescription = " SELECT * FROM prescription t WHERE t.diagnosisid = ? ";
 
 	public DbConnection() {
 		try {
@@ -85,6 +108,32 @@ public class DbConnection {
 
 			stmt.setString(1, patient.getUserName());
 			stmt.setString(2, patient.getPassword());
+
+			ResultSet rs = stmt.executeQuery();
+
+			while (rs.next()) {
+
+				long id = rs.getLong(1);
+				;
+
+				temp = id + "";
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return temp;
+
+	}
+
+	public String ifIsDoctorAndLogin(Doctor doctor) {
+		String temp = "-1";
+		try {
+			PreparedStatement stmt = conn.prepareStatement(SQL_CHECK_LOGIN_DR);
+
+			stmt.setString(1, doctor.getUserName());
+			stmt.setString(2, doctor.getPassword());
 
 			ResultSet rs = stmt.executeQuery();
 
@@ -191,13 +240,20 @@ public class DbConnection {
 		return list;
 	}
 
-	public ArrayList<AppointmentDetails> getAllAppointment(String patientId) {
+	public ArrayList<AppointmentDetails> getAllAppointment(String patientId, String flag) {
 
 		ArrayList<AppointmentDetails> list = null;
 
 		try {
 
-			PreparedStatement stmt = conn.prepareStatement(SQL_PATIENT_DASH);
+			if (flag.equalsIgnoreCase("PA")) {
+				SQL_PATIENT_DR_DASH = SQL_PATIENT_DR_DASH + " where  p.id = ? ";
+			} else {
+				SQL_PATIENT_DR_DASH = SQL_PATIENT_DR_DASH
+						+ " where  (ap.isDiagnosed != 'true'  OR  ap.isDiagnosed IS  NULL) and dc.id = ? ";
+			}
+
+			PreparedStatement stmt = conn.prepareStatement(SQL_PATIENT_DR_DASH);
 			stmt.setString(1, patientId);
 			ResultSet rs = stmt.executeQuery();
 			list = new ArrayList<AppointmentDetails>();
@@ -212,8 +268,12 @@ public class DbConnection {
 				ad.setPatientId(rs.getLong("patientId") + "");
 				ad.setPatientName(rs.getString("patientName"));
 				ad.setTimeSlot(rs.getString("timeslot"));
-				System.out.println(rs.getDate("appDate"));
 				ad.setDate(rs.getDate("appDate") + "");
+				if (flag.equalsIgnoreCase("PA") && (rs.getString("isDiagnosed") != null
+						|| rs.getString("isDiagnosed").equalsIgnoreCase("TRUE"))) {
+
+					ad.setDiagnosis(rs.getString("diagnosisId"));
+				}
 				list.add(ad);
 
 			}
@@ -227,6 +287,205 @@ public class DbConnection {
 			e.printStackTrace();
 		}
 		return list;
+	}
+
+	public Doctor getDoctorDetails(String id) {
+		Doctor doc = null;
+		try {
+			PreparedStatement stmt = conn.prepareStatement(SQL_GET_DOCTOR);
+			stmt.setString(1, id);
+
+			ResultSet rs = stmt.executeQuery();
+			doc = new Doctor();
+			while (rs.next()) {
+
+				doc.setId(rs.getLong(1));
+				doc.setFirstName(rs.getString("firstName"));
+				doc.setLastName(rs.getString("lastName"));
+				doc.setAddress(rs.getString("address"));
+				doc.setBloodGroup(rs.getString("bloodGroup"));
+				doc.setPhoneNo(rs.getString("phoneNo"));
+				doc.setEmailId(rs.getString("emailId"));
+				doc.setDegree(rs.getString("degree"));
+				doc.setGender(rs.getString("gender"));
+				doc.setSpecialization(rs.getString("speciality"));
+
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return doc;
+
+	}
+
+	public void setDiagnosis(List<Prescription> prescriptions, List<Tests> tests, String doctorid, String patientid,
+			String appoId, String remark) {
+		PreparedStatement pstmt = null;
+		AtomicLong atomicLong = new AtomicLong();
+		try {
+			pstmt = conn.prepareStatement(SQL_ADD_DIAGNOSIS);
+			pstmt.setString(1, appoId);
+			pstmt.setString(2, patientid);
+			pstmt.setString(3, doctorid);
+			pstmt.setString(4, remark);
+			int temp = pstmt.executeUpdate();
+
+			pstmt.close();
+			pstmt = conn.prepareStatement(SQL_SELECT_DIAGNOSIS);
+			pstmt.setString(1, appoId);
+			ResultSet resultSet = pstmt.executeQuery();
+
+			while (resultSet.next()) {
+
+				atomicLong.set(resultSet.getLong("id"));
+			}
+
+			prescriptions.stream().forEach(e -> e.setDiagnosisId(atomicLong.get() + ""));
+			tests.stream().forEach(e -> e.setDiagnosisId(atomicLong.get() + ""));
+			setPrescription(prescriptions);
+			setTests(tests);
+
+			updateAppointment(appoId, atomicLong.get());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				pstmt.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+
+	}
+
+	private void updateAppointment(String appoId, long diagId) {
+		PreparedStatement stmt = null;
+		try {
+			stmt = conn.prepareStatement(SQL_UPDATE_APPOINTMENT);
+			stmt.setString(1, "true");
+			stmt.setLong(2, diagId);
+			stmt.setString(3, appoId);
+			stmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void setPrescription(List<Prescription> prescriptions) {
+		PreparedStatement pstmt = null;
+		try {
+			pstmt = conn.prepareStatement(SQL_ADD_PRESCRIPTION);
+
+			for (Prescription prep : prescriptions) {
+
+				pstmt.setString(1, prep.getPatientId());
+				pstmt.setString(2, prep.getDoctorId());
+				pstmt.setString(3, prep.getDrugs());
+				pstmt.setString(4, prep.getDiagnosisId());
+				pstmt.executeUpdate();
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				pstmt.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+
+	}
+
+	public void setTests(List<Tests> tests) {
+		PreparedStatement pstmt = null;
+		try {
+			pstmt = conn.prepareStatement(SQL_ADD_TESTS);
+
+			for (Tests prep : tests) {
+
+				pstmt.setString(1, prep.getDiagnosisId());
+				pstmt.setString(2, prep.getTests());
+				pstmt.setString(3, prep.getDoctorId());
+				pstmt.setString(4, prep.getPatientId());
+
+				pstmt.executeUpdate();
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				pstmt.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+
+	}
+
+	public PrescriptionDetails getPrscription(String diag) {
+		PreparedStatement stmt = null;
+		PrescriptionDetails details = null;
+		try {
+			stmt = conn.prepareStatement(SQ_GET_PRESCRIPTION);
+			stmt.setString(1, diag);
+
+			ResultSet rs = stmt.executeQuery();
+			details = new PrescriptionDetails();
+
+			while (rs.next()) {
+				details.setDiagnosisId(rs.getString("id"));
+				details.setDocrotName(rs.getString("doctorName"));
+				details.setPatientName(rs.getString("patientName"));
+				details.setDocDegree(rs.getString("degree"));
+
+			}
+
+			stmt.close();
+			stmt = conn.prepareStatement(SQ_GET_TEST);
+			stmt.setString(1, details.getDiagnosisId());
+			ResultSet resultSet = stmt.executeQuery();
+			List<Tests> list = new ArrayList<>();
+			while (resultSet.next()) {
+				Tests tests = new Tests();
+				tests.setTests(resultSet.getString("tests"));
+				list.add(tests);
+
+			}
+			stmt.close();
+
+			stmt = conn.prepareStatement(SQ_GET_prescription);
+			stmt.setString(1, details.getDiagnosisId());
+			ResultSet res = stmt.executeQuery();
+			List<Prescription> list2 = new ArrayList<>();
+			while (res.next()) {
+				Prescription pre = new Prescription();
+				pre.setDrugs(res.getString("drugs"));
+
+				list2.add(pre);
+
+			}
+
+			details.setPrescriptions(list2);
+			details.setTests(list);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return details;
 	}
 
 }

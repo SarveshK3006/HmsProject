@@ -16,16 +16,16 @@ import com.sarvesh.hms.dto.Doctor;
 import com.sarvesh.hms.dto.Patient;
 
 /**
- * Servlet implementation class Patientdash
+ * Servlet implementation class Doctordashservlet
  */
-@WebServlet("/Patientdash")
-public class PatientdashServlet extends HttpServlet {
+@WebServlet("/Doctordashservlet")
+public class Doctordashservlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public PatientdashServlet() {
+	public Doctordashservlet() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -37,23 +37,17 @@ public class PatientdashServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		
+		
 
 		String id = (String) request.getAttribute("id");
-
 		DbConnection db = new DbConnection();
-		Patient patient = db.getPatientDetails(id);
-		ArrayList<Doctor> doctors = db.getDoctorList();
-
-		System.err.println(doctors);
-		ArrayList<AppointmentDetails> details = db.getAllAppointment(id,"PA");
-		System.err.println(details);
-
-		RequestDispatcher dispatcher = request.getRequestDispatcher("/jsp/patientdash.jsp");
-		request.setAttribute("patient", patient);
-		request.setAttribute("doctor", doctors);
+		Doctor doc = db.getDoctorDetails(id);
+		ArrayList<AppointmentDetails> details = db.getAllAppointment(id,"DR");
+		RequestDispatcher dispatcher = request.getRequestDispatcher("/jsp/doctordash.jsp");
+		request.setAttribute("doctor", doc);
 		request.setAttribute("details", details);
 		dispatcher.forward(request, response);
-
 	}
 
 	/**
@@ -64,7 +58,6 @@ public class PatientdashServlet extends HttpServlet {
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);
-
 	}
 
 }

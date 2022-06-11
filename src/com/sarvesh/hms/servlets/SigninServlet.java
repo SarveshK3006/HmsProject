@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.sarvesh.hms.dao.DbConnection;
+import com.sarvesh.hms.dto.Doctor;
 import com.sarvesh.hms.dto.Patient;
 
 /**
@@ -51,27 +52,38 @@ public class SigninServlet extends HttpServlet {
 		String pass = request.getParameter("password");
 
 		Patient patient = new Patient();
+		Doctor doctor = new Doctor();
 
 		if (uname != null && !uname.isEmpty()) {
 			patient.setUserName(uname);
+			doctor.setUserName(uname);
 		}
 
 		if (pass != null && !pass.isEmpty()) {
 			patient.setPassword(pass);
+			doctor.setPassword(pass);
 		}
 
 		DbConnection connection = new DbConnection();
-		String result = connection.login(patient);
+
+		String result = connection.ifIsDoctorAndLogin(doctor);
 
 		if (!result.equals("-1")) {
-			PatientdashServlet servlet = new PatientdashServlet();
+			Doctordashservlet servlet = new Doctordashservlet();
 			request.setAttribute("id", result);
-
 			servlet.doGet(request, response);
 		} else {
-			request.setAttribute("result", result);
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/jsp/index.jsp");
-			dispatcher.forward(request, response);
+			result = connection.login(patient);
+			if (!result.equals("-1")) {
+				PatientdashServlet servlet = new PatientdashServlet();
+				request.setAttribute("id", result);
+				servlet.doGet(request, response);
+			} else {
+				request.setAttribute("result", result);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/jsp/index.jsp");
+				dispatcher.forward(request, response);
+			}
+
 		}
 
 	}

@@ -2,34 +2,16 @@ package com.sarvesh.hms.dto;
 
 public class Diagnosis {
 	
-	private int id ;
-	private String diagnosis ;
-	private String prescreption ;
-	private String recTests ;
-	private String remark ;
-	public int getId() {
+	private Long id;
+	private String remark;
+	private String doctorId ;
+	private String patientId;
+	private String appoId;
+	public Long getId() {
 		return id;
 	}
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
-	}
-	public String getDiagnosis() {
-		return diagnosis;
-	}
-	public void setDiagnosis(String diagnosis) {
-		this.diagnosis = diagnosis;
-	}
-	public String getPrescreption() {
-		return prescreption;
-	}
-	public void setPrescreption(String prescreption) {
-		this.prescreption = prescreption;
-	}
-	public String getRecTests() {
-		return recTests;
-	}
-	public void setRecTests(String recTests) {
-		this.recTests = recTests;
 	}
 	public String getRemark() {
 		return remark;
@@ -37,11 +19,33 @@ public class Diagnosis {
 	public void setRemark(String remark) {
 		this.remark = remark;
 	}
+	public String getDoctorId() {
+		return doctorId;
+	}
+	public void setDoctorId(String doctorId) {
+		this.doctorId = doctorId;
+	}
+	public String getPatientId() {
+		return patientId;
+	}
+	public void setPatientId(String patientId) {
+		this.patientId = patientId;
+	}
+	public String getAppoId() {
+		return appoId;
+	}
+	public void setAppoId(String appoId) {
+		this.appoId = appoId;
+	}
+	
 	@Override
 	public String toString() {
-		return "Diagnosis [id=" + id + ", diagnosis=" + diagnosis + ", prescreption=" + prescreption + ", recTests="
-				+ recTests + ", remark=" + remark + "]";
+		return "Diagnosis [id=" + id + ", remark=" + remark + ", doctorId=" + doctorId + ", patientId=" + patientId
+				+ ", appoId=" + appoId + "]";
 	}
+	
+	
+	
 	
 	
 	

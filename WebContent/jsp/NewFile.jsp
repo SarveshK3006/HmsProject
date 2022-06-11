@@ -7,6 +7,7 @@
 <title>Insert title here</title>
 </head>
 <body>
-<h5>WORKING !!!!!!!!</h5>
+<% String id =  request.getParameter("id"); %>>
+<h5>WORKING !!!!!!!! <%=id %>></h5>
 </body>
 </html>

@@ -9,7 +9,7 @@ public class AppointmentDetails {
 	private String patientName;
 	private String doctorName;
 	private String doctorId;
-	private String diagnosis;
+	private String diagnosisId;
 
 	public String getId() {
 		return id;
@@ -68,18 +68,18 @@ public class AppointmentDetails {
 	}
 
 	public String getDiagnosis() {
-		return diagnosis;
+		return diagnosisId;
 	}
 
 	public void setDiagnosis(String diagnosis) {
-		this.diagnosis = diagnosis;
+		this.diagnosisId = diagnosis;
 	}
 
 	@Override
 	public String toString() {
 		return "AppointmentDetails [patientId=" + patientId + ", date=" + date + ", timeSlot=" + timeSlot
 				+ ", patientName=" + patientName + ", doctorName=" + doctorName + ", doctorId=" + doctorId
-				+ ", diagnosis=" + diagnosis + "]";
+				+ ", diagnosis=" + diagnosisId + "]";
 	}
 
 }

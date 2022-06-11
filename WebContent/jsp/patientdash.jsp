@@ -13,10 +13,11 @@
 <link rel="stylesheet" href="./css/patientdash.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Document</title>
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
-  <script src="http://code.jquery.com/jquery-1.8.3.js"></script>
-  <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
-  <script>
+<link rel="stylesheet"
+	href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
+<script src="http://code.jquery.com/jquery-1.8.3.js"></script>
+<script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+<script>
   
   function load() {
 	  var today = new Date();
@@ -66,7 +67,25 @@
 }
 
 
-	</script>
+	function Download(id) {
+
+		$.ajax({
+			url : 'PrescriptionLetter',
+			data : {
+				diag : id
+			},
+			type : 'post',
+			cache : false,
+			success : function(data) {
+				//alert("Booking Done Sucessfully !!!");
+			},
+			error : function() {
+				alert('error');
+			}
+		});
+
+	}
+</script>
 
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
 	rel="stylesheet">
@@ -91,10 +110,16 @@ html, body, h1, h2, h3, h4, h5 {
 </head>
 
 <body onload="load()">
-	<% Patient patient = (Patient)request.getAttribute("patient"); %>
-	<% List<Doctor> list =  (List<Doctor>) request.getAttribute("doctor"); %>
-	<% List<AppointmentDetails> details =  (List<AppointmentDetails>) request.getAttribute("details"); %>
-		
+	<%
+		Patient patient = (Patient) request.getAttribute("patient");
+	%>
+	<%
+		List<Doctor> list = (List<Doctor>) request.getAttribute("doctor");
+	%>
+	<%
+		List<AppointmentDetails> details = (List<AppointmentDetails>) request.getAttribute("details");
+	%>
+
 
 
 	<div class="topnav">
@@ -114,27 +139,27 @@ html, body, h1, h2, h3, h4, h5 {
 					<hr>
 					<p>
 						<i
-							class="material-symbols-outlined fa-fw w3-margin-right w3-text-theme">person</i><%= patient.getFirstName() +" " +patient.getLastName() %>
+							class="material-symbols-outlined fa-fw w3-margin-right w3-text-theme">person</i><%=patient.getFirstName() + " " + patient.getLastName()%>
 					</p>
 					<p>
-						<i class="fa fa-home fa-fw w3-margin-right w3-text-theme"></i><%= patient.getAddress() %>
-						
+						<i class="fa fa-home fa-fw w3-margin-right w3-text-theme"></i><%=patient.getAddress()%>
+
 					</p>
 					<p>
-						<i class="fa fa-birthday-cake fa-fw w3-margin-right w3-text-theme"></i><%= patient.getDob() %>
-				
-					</p>
-					<p>
-						<i
-							class="material-symbols-outlined fa-fw w3-margin-right w3-text-theme">bloodtype</i><%= patient.getBloodGroup() %>
+						<i class="fa fa-birthday-cake fa-fw w3-margin-right w3-text-theme"></i><%=patient.getDob()%>
+
 					</p>
 					<p>
 						<i
-							class="material-symbols-outlined fa-fw w3-margin-right w3-text-theme">call</i><%= patient.getPhoneNo() %>
+							class="material-symbols-outlined fa-fw w3-margin-right w3-text-theme">bloodtype</i><%=patient.getBloodGroup()%>
 					</p>
 					<p>
 						<i
-							class="material-symbols-outlined fa-fw w3-margin-right w3-text-theme">mail</i><%= patient.getEmailId() %>
+							class="material-symbols-outlined fa-fw w3-margin-right w3-text-theme">call</i><%=patient.getPhoneNo()%>
+					</p>
+					<p>
+						<i
+							class="material-symbols-outlined fa-fw w3-margin-right w3-text-theme">mail</i><%=patient.getEmailId()%>
 					</p>
 
 				</div>
@@ -148,23 +173,37 @@ html, body, h1, h2, h3, h4, h5 {
 
 			<div class="w3-card w3-round w3-white">
 				<table>
-				<thead>
-					<tr>
-						<th>Id</th>
-						<th>Appointment Date</th>
-						<th>Doctor Name</th>
-						<th>Diagnosis</th>
-					</tr>
+					<thead>
+						<tr>
+							<th>Id</th>
+							<th>Appointment Date</th>
+							<th>Doctor Name</th>
+							<th>Diagnosis</th>
+						</tr>
 					</thead>
 					<tbody>
-					<% for( AppointmentDetails ad : details) { %>
-					<tr>
-						<td><%= ad.getId() %></td>
-						<td><%=ad.getDate() + " " + ad.getTimeSlot() %></td>
-						<td><%=ad.getDoctorName() %></td>
-						<td>NA</td>
-					</tr>
-				<% } %>
+						<%
+							for (AppointmentDetails ad : details) {
+						%>
+						<tr>
+							<td><%=ad.getId()%></td>
+							<td><%=ad.getDate() + " " + ad.getTimeSlot()%></td>
+							<td><%=ad.getDoctorName()%></td>
+							<%
+								if (ad.getDiagnosis() != null) {
+							%>
+							<td><a href="${pageContext.request.contextPath}/PrescriptionLetter?diag=<%=ad.getDiagnosis()%>" >Download</a></td>
+							<%
+								} else {
+							%>
+							<td>NA</td>
+							<%
+								}
+							%>
+						</tr>
+						<%
+							}
+						%>
 					</tbody>
 				</table>
 			</div>
@@ -175,38 +214,41 @@ html, body, h1, h2, h3, h4, h5 {
 
 	<div class="lower">
 		<div class="w3-card w3-round w3-white" style="padding: 28px">
-			
-				<fieldset>
-					<legend class="w3-text-theme">Book an appointment</legend>
-					<div class="two-cols">
-						<label class="w3-text-theme"> Doctor Name </label> 
-						<select name="doc" id="docs" >
-							<%  for(Doctor doc : list) {  %>
-							  <option value=<%= doc.getId() %>><%=doc.getFirstName() +" "+doc.getDegree() %></option>
-							  <% } %>
-						</select> <label class="w3-text-theme">
-              <input type="date" class="w3-text-theme" id = "date" name="datetime" required>
-              <input type="hidden" id="petientId" value ="<%= patient.getId() %>" name="petientId" >
-            </label>
-      <label class="w3-text-theme"> Select Time </label>
-          <select name="timeslot" id="timeslot" >
-            <option value="10am-11am">10am-11am</option>
-            <option value="11am-12pm">11am-12pm</option>
-            <option value="12pm-1pm">12pm-1pm</option>
-            <option value="1pm-2pm">1pm-2pm</option>
-            <option value="2pm-3pm">2pm-3pm</option>
-            <option value="3pm-4pm">3pm-4pm</option>
-            <option value="4pm-5pm">4pm-5pm</option>
-          </select>
-          
-          <input type="text" class="w3-text-theme" name="_gotcha" value=""
-							style="display: none;"> 
-							
-							<button class="submit-button" onclick="myFunction()">Click me</button>
-							
 
-					</div>
-				</fieldset>
+			<fieldset>
+				<legend class="w3-text-theme">Book an appointment</legend>
+				<div class="two-cols">
+					<label class="w3-text-theme"> Doctor Name </label> <select
+						name="doc" id="docs">
+						<%
+							for (Doctor doc : list) {
+						%>
+						<option value=<%=doc.getId()%>>><%=doc.getFirstName() + " " + doc.getDegree()%></option>
+						<%
+							}
+						%>
+					</select> <label class="w3-text-theme"> <input type="date"
+						class="w3-text-theme" id="date" name="datetime" required>
+						<input type="hidden" id="petientId" value="<%=patient.getId()%>"
+						name="petientId">
+					</label> <label class="w3-text-theme"> Select Time </label> <select
+						name="timeslot" id="timeslot">
+						<option value="10am-11am">10am-11am</option>
+						<option value="11am-12pm">11am-12pm</option>
+						<option value="12pm-1pm">12pm-1pm</option>
+						<option value="1pm-2pm">1pm-2pm</option>
+						<option value="2pm-3pm">2pm-3pm</option>
+						<option value="3pm-4pm">3pm-4pm</option>
+						<option value="4pm-5pm">4pm-5pm</option>
+					</select> <input type="text" class="w3-text-theme" name="_gotcha" value=""
+						style="display: none;">
+
+					<button class="submit-button" onclick="myFunction()">Click
+						me</button>
+
+
+				</div>
+			</fieldset>
 
 
 		</div>
