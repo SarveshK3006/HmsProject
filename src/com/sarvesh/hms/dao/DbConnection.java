@@ -259,7 +259,7 @@ public class DbConnection {
 			list = new ArrayList<AppointmentDetails>();
 
 			while (rs.next()) {
-
+  String isDiagnosed= rs.getString("isDiagnosed");
 				AppointmentDetails ad = new AppointmentDetails();
 
 				ad.setId(rs.getLong("id") + "");
@@ -269,18 +269,19 @@ public class DbConnection {
 				ad.setPatientName(rs.getString("patientName"));
 				ad.setTimeSlot(rs.getString("timeslot"));
 				ad.setDate(rs.getDate("appDate") + "");
-				if (flag.equalsIgnoreCase("PA") && (rs.getString("isDiagnosed") != null
-						|| rs.getString("isDiagnosed").equalsIgnoreCase("TRUE"))) {
-
+				
+				System.out.println(flag);
+				System.out.println(rs!= null);
+				if (flag.equalsIgnoreCase("PA") && isDiagnosed!=null
+						&& isDiagnosed.equalsIgnoreCase("TRUE")){
 					ad.setDiagnosis(rs.getString("diagnosisId"));
 				}
+			
 				list.add(ad);
 
 			}
 
-			while (rs.next()) {
-
-			}
+			
 
 		} catch (Exception e) {
 
