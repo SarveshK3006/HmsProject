@@ -73,6 +73,8 @@ public class DbConnection {
 	}
 
 	public void insertPatient(Patient patient) {
+		
+		System.out.println(patient);
 
 		try {
 

@@ -48,6 +48,8 @@ public class SignupServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		
+		
 
 		String fname = request.getParameter("fname");
 		String mname = request.getParameter("mname");
@@ -62,7 +64,7 @@ public class SignupServlet extends HttpServlet {
 		String mob = request.getParameter("mob");
 		String age = request.getParameter("age");
 		Patient patient = new Patient();
-
+		System.out.println(pass);
 		if (fname != null && !fname.isEmpty()) {
 			patient.setFirstName(fname);
 		}
