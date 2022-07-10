@@ -114,11 +114,18 @@ public class SignupServlet extends HttpServlet {
 		}
 
 		DbConnection connection = new DbConnection();
-		connection.insertPatient(patient);
-
-		RequestDispatcher dispatcher = request.getRequestDispatcher("/jsp/signup.jsp");
-		request.setAttribute("result", "done");
-		dispatcher.forward(request, response);
+		int ret = connection.insertPatient(patient);
+if (ret>0) {
+	RequestDispatcher dispatcher = request.getRequestDispatcher("/jsp/index.jsp");
+	request.setAttribute("result", "done");
+	dispatcher.forward(request, response);
+}
+else {
+	RequestDispatcher dispatcher = request.getRequestDispatcher("/jsp/signup.jsp");
+	request.setAttribute("result", "fail");
+	dispatcher.forward(request, response);
+}
+	
 
 	}
 

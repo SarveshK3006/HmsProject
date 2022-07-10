@@ -72,10 +72,10 @@ public class DbConnection {
 		}
 	}
 
-	public void insertPatient(Patient patient) {
+	public int insertPatient(Patient patient) {
 		
 		System.out.println(patient);
-
+ int ret = 0;
 		try {
 
 			// Step 3: create Statement
@@ -93,14 +93,16 @@ public class DbConnection {
 			stmt.setString(11, patient.getAge());
 			stmt.setString(12, patient.getDob());
 			// Step 4: Execute Query
-			stmt.executeUpdate();
-
+			ret =stmt.executeUpdate();
+   
 			// step 5:
 			conn.close();
+			return ret;
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return ret;
 	}
 
 	public String login(Patient patient) {

@@ -53,11 +53,13 @@
 	      cache:false,
 	      success:function(data){
 	         alert("Booking Done Sucessfully !!!");
+	         location.reload();
 	        // $('#somediv').text(responseText); 
 	      },
 	      error:function(){
 	        alert('error');
 	      }
+	      
 	   }
 	);   
 	  }else{
@@ -124,8 +126,8 @@ html, body, h1, h2, h3, h4, h5 {
 
 	<div class="topnav">
 		<a class="active" href="#home">Home</a> <a href="#contact">Contact</a>
-		<a href="#about">About</a> <a href="#" class="notification"> <span>Inbox</span>
-			<span class="badge">1</span>
+		<a href="#">About</a> <a href="http://localhost:8080/HMSproj/" class="notification"> <span>Log Out</span>
+			
 		</a>
 	</div>
 
@@ -243,8 +245,8 @@ html, body, h1, h2, h3, h4, h5 {
 					</select> <input type="text" class="w3-text-theme" name="_gotcha" value=""
 						style="display: none;">
 
-					<button class="submit-button" onclick="myFunction()">Click
-						me</button>
+					<button class="submit-button" onclick="myFunction()">Book Appointment
+				</button>
 
 
 				</div>
